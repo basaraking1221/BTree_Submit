@@ -8,6 +8,7 @@
 #include <cstring>
 const  int Mmax=1000;
 const  int Lmax=400;
+const int maxlength=30;
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
     class BTree {
@@ -95,11 +96,11 @@ namespace sjtu {
 
         //根节点？也不算吧，那就定名为索引。
         struct indexs{
-            ssize_t head;
-            ssize_t tail;
-            ssize_t root;
+            size_t head;
+            size_t tail;
+            size_t root;
             size_t length;
-            ssize_t endd;
+            size_t endd;
             indexs(){
                 head=0;
                 tail=0;
@@ -110,12 +111,12 @@ namespace sjtu {
         };
         //中间节点
         struct midroot{
-            ssize_t parent;
-            ssize_t children[Mmax+1];
+            size_t parent;
+            size_t children[Mmax+1];
             bool type;
             Key key[Mmax];
             size_t num;
-            ssize_t position;
+            size_t position;
             midroot(){
                 parent=0;
                 for(int i=0;i<=Mmax;i++) children[i]=0;
@@ -127,13 +128,13 @@ namespace sjtu {
         };
         //叶子节点
         struct leaves{
-            ssize_t parent;
-            ssize_t prev,next;
+            size_t parent;
+            size_t prev,next;
             size_t pairnum;
             //你敢信我写到最后了才发现，这个Value_type跟我写的不一样？？？？
             Key datak[Lmax+1];
             Value datav[Lmax+1];
-            ssize_t position;
+            size_t position;
             leaves(){
                 parent=0;
                 prev=0;
@@ -144,7 +145,7 @@ namespace sjtu {
         };
         struct filename{
             char *str;
-            filename(){str=new char [100];}
+            filename(){str=new char [maxlength];}
             ~filename(){if(!str) delete str;}
         };//第二次加的，刚搞明白不能用路径来写。。
         FILE *txt;//txt文本
@@ -159,13 +160,13 @@ namespace sjtu {
             if(whetheropen == false){
                 txt=fopen(txtname.str,"rb+");
             }
-            if(txt== nullptr){
+             if(txt== nullptr){
                 whetherexist= false;//鬼知道还会打开失败歪日，你试试第一次运行就没打开的心态？
                 txt=fopen(txtname.str,"w");
                 fclose(txt);
                 txt=fopen(txtname.str,"rb+");
             }
-            else readfile(&catalogue,0,1, sizeof(indexs));
+             else readfile(&catalogue,0,1, sizeof(indexs));
             whetheropen=true;
         }
         void closefile(){
@@ -186,7 +187,6 @@ namespace sjtu {
         void maketree(){
             //先开始操作目录
             catalogue.length=0;
-            catalogue.endd= sizeof(indexs);
             //根节点和叶子节点建立
             midroot root;
             leaves leaf1,leaf2;
