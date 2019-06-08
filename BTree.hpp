@@ -234,7 +234,7 @@ namespace sjtu {
                 for(;i<tmp.num;i++){
                     if(key<tmp.key[i]) break;//找到真爱
                 }
-                return tmp.children[i-1];
+                return tmp.children[i];
             }
             else {
                 size_t i=0;
@@ -245,7 +245,7 @@ namespace sjtu {
                         break;
                     }
                 }
-                return findleaves(key,tmp.children[i-1]);
+                return findleaves(key,tmp.children[i]);
             }
         }
         //插入之前应该先会查找吧，不然插个龟龟
@@ -460,7 +460,7 @@ namespace sjtu {
                 midroot root;
                 leaves leave;
                 readfile(&root,catalogue.root,1, sizeof(midroot));
-                readfile(&leave,catalogue.tail,1, sizeof(leaves));
+                readfile(&leave,catalogue.tail,1, sizeof(leave));
 
                 root.key[0]=key;
                 leave.datak[0]=key;
