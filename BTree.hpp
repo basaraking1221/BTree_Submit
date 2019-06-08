@@ -12,6 +12,66 @@ const int maxlength=30;
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
     class BTree {
+    private:
+        //根节点？也不算吧，那就定名为索引。
+        struct indexs{
+            size_t head;
+            size_t tail;
+            size_t root;
+            size_t length;
+            size_t endd;
+            indexs(){
+                head=0;
+                tail=0;
+                root=0;
+                length=0;
+                endd=0;
+            }
+        };
+        //中间节点
+        struct midroot{
+            size_t parent;
+            size_t children[Mmax+1];
+            bool type;
+            Key key[Mmax];
+            size_t num;
+            size_t position;
+            midroot(){
+                parent=0;
+                for(int i=0;i<=Mmax;i++) children[i]=0;
+                num=0;
+                type= false;
+                position=0;
+            }
+
+        };
+        //叶子节点
+        struct leaves{
+            size_t parent;
+            size_t prev,next;
+            size_t pairnum;
+            //你敢信我写到最后了才发现，这个Value_type跟我写的不一样？？？？
+            Key datak[Lmax+1];
+            Value datav[Lmax+1];
+            size_t position;
+            leaves(){
+                parent=0;
+                prev=0;
+                next=0;
+                pairnum=0;
+                position=0;
+            }
+        };
+        struct filename{
+            char *str;
+            filename(){str=new char [maxlength];}
+            ~filename(){if(!str) delete str;}
+        };//第二次加的，刚搞明白不能用路径来写。。
+        FILE *txt;//txt文本
+        bool whetheropen=false;//打不打开
+        indexs catalogue;//我英语很棒了
+        bool whetherexist=false;//竟然还有文件原来已经存在这一说。。
+        filename txtname;
     public:
         typedef pair<const Key, Value> value_type;
 
@@ -24,6 +84,9 @@ namespace sjtu {
             size_t pairposition;
             BTree *bplustree;
         public:
+            bool modify(const Value& value){
+
+            }
             iterator() {
                 // TODO Default Constructor
                 bplustree=NULL;
@@ -92,68 +155,7 @@ namespace sjtu {
                 pairposition=other.pairposition;
             }
         };
-    private:
-
-        //根节点？也不算吧，那就定名为索引。
-        struct indexs{
-            size_t head;
-            size_t tail;
-            size_t root;
-            size_t length;
-            size_t endd;
-            indexs(){
-                head=0;
-                tail=0;
-                root=0;
-                length=0;
-                endd=0;
-            }
-        };
-        //中间节点
-        struct midroot{
-            size_t parent;
-            size_t children[Mmax+1];
-            bool type;
-            Key key[Mmax];
-            size_t num;
-            size_t position;
-            midroot(){
-                parent=0;
-                for(int i=0;i<=Mmax;i++) children[i]=0;
-                num=0;
-                type= false;
-                position=0;
-            }
-
-        };
-        //叶子节点
-        struct leaves{
-            size_t parent;
-            size_t prev,next;
-            size_t pairnum;
-            //你敢信我写到最后了才发现，这个Value_type跟我写的不一样？？？？
-            Key datak[Lmax+1];
-            Value datav[Lmax+1];
-            size_t position;
-            leaves(){
-                parent=0;
-                prev=0;
-                next=0;
-                pairnum=0;
-                position=0;
-            }
-        };
-        struct filename{
-            char *str;
-            filename(){str=new char [maxlength];}
-            ~filename(){if(!str) delete str;}
-        };//第二次加的，刚搞明白不能用路径来写。。
-        FILE *txt;//txt文本
-        bool whetheropen=false;//打不打开
-        indexs catalogue;//我英语很棒了
-        bool whetherexist=false;//竟然还有文件原来已经存在这一说。。
-        filename txtname;
-    public:
+        
         //进行一些文件操作，本来想直接open等但是不如写成函数来的快--------下面进行第二次调试及更改
         void openfile(){
             whetherexist=true;
