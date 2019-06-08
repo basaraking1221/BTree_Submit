@@ -157,26 +157,29 @@ namespace sjtu {
         };
 
         //进行一些文件操作，本来想直接open等但是不如写成函数来的快--------下面进行第二次调试及更改
-        void openfile(){
-            whetherexist=true;
-            if(whetheropen == false){
-                txt=fopen(txtname.str,"rb+");
+        void openfile() {
+            whetherexist = true;
+            if (whetheropen == false) {
+                txt = fopen(txtname.str, "rb+");
+
+                if (txt == nullptr) {
+                    whetherexist = false;//鬼知道还会打开失败歪日，你试试第一次运行就没打开的心态？
+                    txt = fopen(txtname.str, "w");
+                    fclose(txt);
+                    txt = fopen(txtname.str, "rb+");
+                }
+                else readfile(&catalogue, 0, 1, sizeof(indexs));
+
+
+                whetheropen = true;
             }
-             if(txt== nullptr){
-                whetherexist= false;//鬼知道还会打开失败歪日，你试试第一次运行就没打开的心态？
-                txt=fopen(txtname.str,"w");
-                fclose(txt);
-                txt=fopen(txtname.str,"rb+");
-            }
-             else readfile(&catalogue,0,1, sizeof(indexs));
-            whetheropen=true;
         }
         void closefile(){
             if(whetheropen==true)
                 fclose(txt);
             whetheropen= false;
         }
-        void readfile(void *place,size_t pos,size_t num, size_t size)const{
+        void readfile(void *place,size_t pos,size_t num, size_t size){
             fseek(txt,pos,SEEK_SET);
             fread(place,size,num,txt);
         }
@@ -245,6 +248,7 @@ namespace sjtu {
                 for(i=0;i<tmp.num;i++){
                     if(key<tmp.key[i]) break;//找到真爱
                 }
+
                 return tmp.children[i];
             }
             else {
