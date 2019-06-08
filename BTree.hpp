@@ -189,24 +189,33 @@ namespace sjtu {
             catalogue.endd= sizeof(indexs);
             //根节点和叶子节点建立
             midroot root;
-            leaves leaf;
+            leaves leaf1,leaf2;
             //一步步的摆正目录、各个节点的位置（position）
-            catalogue.root=root.position=catalogue.endd;
-            catalogue.endd+= sizeof(midroot);
-            catalogue.head=catalogue.tail=leaf.position=catalogue.endd;
-            catalogue.endd+= sizeof(leaves);
+          root.position= sizeof(indexs);
+          catalogue.root=root.position;
+          leaf1.position= sizeof(indexs)+ sizeof(midroot);
+          leaf2.position=leaf1.position+ sizeof(leaves);
+          catalogue.head=leaf1.position;
+          catalogue.tail=leaf2.position;
+          catalogue.endd= sizeof(indexs)+ sizeof(midroot)+ sizeof(leaves)*2;
             //挨个初始化
             root.parent=0;
-            root.num=1;
+            root.num=0;
             root.type=true;
-            root.children[0]=leaf.position;
-            leaf.parent=root.position;
-            leaf.next=leaf.prev=0;
-            leaf.pairnum=0;
+            root.children[0]=leaf1.position;
+            root.children[1]=leaf2.position;
+            leaf1.parent=root.position;
+            leaf2.parent=root.position;
+            leaf2.prev=leaf1.position;
+            leaf1.prev=0;
+            leaf1.next=leaf2.position;
+            leaf2.next=0;
+            leaf1.pairnum=leaf2.pairnum=0;
             //全扔进文件里，写tmd
             writefile(&catalogue,0,1, sizeof(indexs));
             writefile(&root,root.position,1, sizeof(midroot));
-            writefile(&leaf,leaf.position,1, sizeof(leaves));
+            writefile(&leaf1,leaf1.position,1, sizeof(leaves));
+            writefile(&leaf2,leaf2.position,1, sizeof(leaves));
         }
         BTree() {
             txt= nullptr;
