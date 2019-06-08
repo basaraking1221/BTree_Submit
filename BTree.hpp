@@ -1,7 +1,7 @@
-#include "utility.hpp"
+#include "utility.h"
 #include <functional>
 #include <cstddef>
-#include "exception.hpp"
+#include "exception.h"
 #include <fstream>
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
@@ -201,13 +201,13 @@ namespace sjtu {
         ~BTree() {
           closefile();
         }
-        //貌似查找直接遍历不行。。。所以我们现在在叶子节点操作下
+        //貌似查找直接遍历不行。。。所以我们现在在不同节点类型查找操作下
         ssize_t  findleaves(Key key,size_t position){
                midroot tmp;
                readfile(&tmp,position,1, sizeof(midroot));
                if(tmp.type==true)//恭喜你有儿子了
                {
-                   size_t i=0;
+                   size_t i=0;//连 int i 都不写了
                    for(;i<tmp.num;i++){
                        if(key<tmp.key[i]) break;//找到真爱
                    }
@@ -294,10 +294,10 @@ namespace sjtu {
             writefile(&leaf,leaf.position,1, sizeof(leaves));
             else splitleaf(leaf,ret,key);
 
-            return  pair<iterator,OperationResult >(ret,Success);
+            return  pair<iterator,OperationResult>(ret,Success);
          }
          void insertnode(midroot & mid,Key key,size_t newleafpos){
-             int i=0;
+             size_t i=0;
              for(;i<mid.num;i++){
                  if(key<mid.key[i]) break;
              }
@@ -358,7 +358,7 @@ namespace sjtu {
              readfile(&parent,leaf.parent,1, sizeof(midroot));
              insertnode(parent,newleaf.datak[0],newleaf.position);
          }
-         void splitnode(midroot node){
+         void splitnode(midroot &node){
              midroot newnode;
              /*
               * 现在node的key的个数应该是m个
