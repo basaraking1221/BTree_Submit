@@ -409,7 +409,7 @@ namespace sjtu {
                     writefile(&leaf, leaf.position, 1, sizeof(leaves));
                 } else {
                     midroot mid;
-                    readfile(&mid, newnode.children[i], 1, sizeof(mid));
+                    readfile(&mid, newnode.children[i], 1, sizeof(midroot));
                     mid.parent = newnode.position;
                     writefile(&mid, mid.position, 1, sizeof(midroot));
                 }
