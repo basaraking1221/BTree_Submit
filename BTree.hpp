@@ -6,6 +6,8 @@
 #include "exception.hpp"
 #include <fstream>
 #include <cstring>
+const  int Mmax=3000;
+const  int Lmax=300;
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
     class BTree {
@@ -34,7 +36,7 @@ namespace sjtu {
                 pairposition=other.pairposition;
             }
             iterator operator++(int) {
-                // Todo iterator++ 
+                // Todo iterator++
 
             }
             iterator& operator++() {
@@ -90,9 +92,7 @@ namespace sjtu {
             }
         };
     private:
-        static const  int Mmax=3000;
-        static const  int Lmax=300;
-        static const int  indexpos=0;
+     
         //根节点？也不算吧，那就定名为索引。
         struct indexs{
             ssize_t head;
@@ -152,6 +152,7 @@ namespace sjtu {
         indexs catalogue;//我英语很棒了
         bool whetherexist=false;//竟然还有文件原来已经存在这一说。。
         filename txtname;
+    public:
         //进行一些文件操作，本来想直接open等但是不如写成函数来的快--------下面进行第二次调试及更改
         void openfile(){
             whetherexist=true;
@@ -207,8 +208,6 @@ namespace sjtu {
             writefile(&root,root.position,1, sizeof(midroot));
             writefile(&leaf,leaf.position,1, sizeof(leaves));
         }
-
-    public:
         BTree() {
             txt=NULL;
             openfile();
@@ -224,7 +223,7 @@ namespace sjtu {
         ~BTree() {
             closefile();
         }
-        
+
         //貌似查找直接遍历不行。。。所以我们现在在叶子节点操作下
         size_t  findleaves(Key key,size_t position){
             midroot tmp;
