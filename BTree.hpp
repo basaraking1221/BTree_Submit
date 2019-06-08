@@ -6,7 +6,7 @@
 #include "exception.hpp"
 #include <fstream>
 #include <cstring>
-const  int Mmax=1000;
+const  int Mmax=2000;
 const  int Lmax=300;
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
@@ -144,7 +144,7 @@ namespace sjtu {
         };
         struct filename{
             char *str;
-            filename(){str=new char [100];}
+            filename(){str=new char [300];}
             ~filename(){if(!str) delete str;}
         };//第二次加的，刚搞明白不能用路径来写。。
         FILE *txt;//txt文本
