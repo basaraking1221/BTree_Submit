@@ -64,7 +64,7 @@ namespace sjtu {
         };
         struct filename{
             char *str;
-            filename(){str=new char [maxlength];}
+            filename(){str=new char [maxlength];strcpy(str,"bplustree.txt");}
             ~filename(){if(!str) delete str;}
         };//第二次加的，刚搞明白不能用路径来写。。
         FILE *txt;//txt文本
