@@ -34,7 +34,7 @@ namespace sjtu {
                 pairposition=other.pairposition;
             }
             iterator operator++(int) {
-                // Todo iterator++
+                // Todo iterator++ 
 
             }
             iterator& operator++() {
@@ -208,7 +208,7 @@ namespace sjtu {
             writefile(&leaf,leaf.position,1, sizeof(leaves));
         }
 
-
+    public:
         BTree() {
             txt=NULL;
             openfile();
@@ -224,6 +224,7 @@ namespace sjtu {
         ~BTree() {
             closefile();
         }
+        
         //貌似查找直接遍历不行。。。所以我们现在在叶子节点操作下
         size_t  findleaves(Key key,size_t position){
             midroot tmp;
