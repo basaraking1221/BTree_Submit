@@ -1,8 +1,8 @@
 #include "utility.hpp"
-#include <iostream>
+
 #include <functional>
 #include <cstddef>
-#include <string>
+
 #include "exception.hpp"
 #include <fstream>
 #include <cstring>
@@ -550,6 +550,7 @@ namespace sjtu {
         // return a reference to the first value that is mapped to a key equivalent to
         // key. Throw an exception if the key does not exist
         Value  at(const Key& key) {
+
             int leafpos = findleaves(key,catalogue.root);
             leaves leaf;
             readfile(&leaf,leafpos,1, sizeof(leaves));
