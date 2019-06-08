@@ -6,7 +6,7 @@
 #include "exception.hpp"
 #include <fstream>
 #include <cstring>
-const  int Mmax=3000;
+const  int Mmax=1000;
 const  int Lmax=300;
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
@@ -92,7 +92,7 @@ namespace sjtu {
             }
         };
     private:
-     
+
         //根节点？也不算吧，那就定名为索引。
         struct indexs{
             ssize_t head;
