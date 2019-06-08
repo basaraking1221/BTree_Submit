@@ -1,7 +1,7 @@
-#include "utility.hpp"
+#include "utility.h"
 #include <functional>
 #include <cstddef>
-#include "exception.hpp"
+#include "exception.h"
 #include <fstream>
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
@@ -130,13 +130,13 @@ namespace sjtu {
              if(whetheropen == false){
                  txt=fopen(txtname.str,"rw+");
              }
-             if(txt==NULL){
+             if(txt== nullptr){
                  whetherexist= false;//鬼知道还会打开失败歪日，你试试第一次运行就没打开的心态？
                  txt=fopen(txtname.str,"w");
                  fclose(txt);
                  txt=fopen(txtname.str,"rw+");
              }
-             else readfile(&catalogue,indexpos,1, sizeof(indexs));
+             else readfile(&catalogue,0,1, sizeof(indexs));
              whetheropen=true;
          }
         void closefile(){
@@ -160,22 +160,29 @@ namespace sjtu {
              catalogue.endd= sizeof(indexs);
              //根节点和叶子节点建立
              midroot root;
-             leaves leaf;
+             leaves leaf1,leaf2;
              //一步步的摆正目录、各个节点的位置（position）
              catalogue.root=root.position=catalogue.endd;
              catalogue.endd+= sizeof(midroot);
-             catalogue.head=catalogue.tail=leaf.position=catalogue.endd;
+             catalogue.head=catalogue.tail=leaf1.position=catalogue.endd;
+             catalogue.endd+= sizeof(leaves);
+             catalogue.head=catalogue.tail=leaf2.position=catalogue.endd;
              catalogue.endd+= sizeof(leaves);
              //挨个初始化
              root.parent=0;
              root.num=0;
              root.type=true;
-             root.children[0]=leaf.position;
-             leaf.parent=root.position;
-             leaf.next=leaf.prev=0;
-             leaf.pairnum=0;
+             root.children[0]=leaf1.position;
+             root.children[1]=leaf2.position;
+             leaf1.parent=root.position;
+             leaf2.parent=root.position;
+             leaf2.prev=leaf1.position;
+             leaf2.next=leaf1.prev=0;
+             leaf1.next=leaf2.position;
+             leaf1.pairnum=0;
+             leaf2.pairnum=0;
              //全扔进文件里，写tmd
-             writefile(&catalogue,indexpos,1, sizeof(indexs));
+             writefile(&catalogue,0,1, sizeof(indexs));
              writefile(&root,root.position,1, sizeof(midroot));
              writefile(&leaf,leaf.position,1, sizeof(leaves));
          }
