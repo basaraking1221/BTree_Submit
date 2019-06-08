@@ -1,14 +1,14 @@
 #include "utility.hpp"
+#include <iostream>
 #include <functional>
 #include <cstddef>
+#include <string>
+#include "exception.hpp"
 #include <fstream>
 #include <cstring>
-#include "exception.hpp"
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
     class BTree {
-    private:
-        // Your private members go here
     public:
         typedef pair<const Key, Value> value_type;
 
@@ -71,7 +71,7 @@ namespace sjtu {
             ssize_t head;
             ssize_t tail;
             ssize_t root;
-            size_t  length;
+            ssize_t  length;
             ssize_t endd;
             indexs(){
                 head=0;
@@ -125,17 +125,18 @@ namespace sjtu {
         indexs catalogue;//我英语很棒了
         bool whetherexist=false;//竟然还有文件原来已经存在这一说。。
         filename txtname;
+    public:
         //进行一些文件操作，本来想直接open等但是不如写成函数来的快--------下面进行第二次调试及更改
         void openfile(){
             whetherexist=true;
             if(whetheropen == false){
-                txt=fopen(txtname.str,"rw+");
+                txt=fopen(txtname.str,"rb+");
             }
             if(txt==NULL){
                 whetherexist= false;//鬼知道还会打开失败歪日，你试试第一次运行就没打开的心态？
                 txt=fopen(txtname.str,"w");
                 fclose(txt);
-                txt=fopen(txtname.str,"rw+");
+                txt=fopen(txtname.str,"rb+");
             }
             else readfile(&catalogue,0,1, sizeof(indexs));
             whetheropen=true;
@@ -145,11 +146,11 @@ namespace sjtu {
                 fclose(txt);
             whetheropen= false;
         }
-        void readfile(void *place,ssize_t pos,size_t num, size_t size)const{
+        void readfile(void *place,size_t pos,size_t num, size_t size)const{
             fseek(txt,pos,SEEK_SET);
             fread(place,size,num,txt);
         }
-        void writefile(void *place,ssize_t pos,size_t num,size_t size){
+        void writefile(void *place,size_t pos,size_t num,size_t size){
             fseek(txt,pos,SEEK_SET);
             fwrite(place,size,num,txt);
         }
@@ -180,6 +181,8 @@ namespace sjtu {
             writefile(&root,root.position,1, sizeof(midroot));
             writefile(&leaf,leaf.position,1, sizeof(leaves));
         }
+
+
         BTree() {
             txt=NULL;
             openfile();
@@ -196,7 +199,7 @@ namespace sjtu {
             closefile();
         }
         //貌似查找直接遍历不行。。。所以我们现在在叶子节点操作下
-        ssize_t  findleaves(Key key,size_t position){
+        size_t  findleaves(Key key,size_t position){
             midroot tmp;
             readfile(&tmp,position,1, sizeof(midroot));
             if(tmp.type==true)//恭喜你有儿子了
