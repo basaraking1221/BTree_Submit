@@ -1,8 +1,8 @@
 #include "utility.hpp"
 #include <functional>
 #include <cstddef>
-#include "exception.hpp"
 #include <fstream>
+#include <cstring>
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
     class BTree {
