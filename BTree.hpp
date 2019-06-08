@@ -7,7 +7,6 @@
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
     class BTree {
-    private:
         // Your private members go here
     public:
         typedef pair<const Key, Value> value_type;
@@ -125,6 +124,7 @@ namespace sjtu {
         indexs catalogue;//我英语很棒了
         bool whetherexist=false;//竟然还有文件原来已经存在这一说。。
         filename txtname;
+        public:
       //进行一些文件操作，本来想直接open等但是不如写成函数来的快--------下面进行第二次调试及更改
          void openfile(){
              whetherexist=true;
