@@ -98,7 +98,7 @@ namespace sjtu {
             ssize_t head;
             ssize_t tail;
             ssize_t root;
-            ssize_t  length;
+            size_t length;
             ssize_t endd;
             indexs(){
                 head=0;
@@ -118,7 +118,7 @@ namespace sjtu {
             ssize_t position;
             midroot(){
                 parent=0;
-                memset(children,0,Mmax);
+                for(int i=0;i<=Mmax;i++) children[i]=0;
                 num=0;
                 type= false;
                 position=0;
