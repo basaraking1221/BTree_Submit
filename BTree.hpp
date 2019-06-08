@@ -370,6 +370,10 @@ namespace sjtu {
              node.num/=2;
              newnode.position=catalogue.endd;
              catalogue.endd+= sizeof(midroot);
+
+             for(int i=0;i<newnode.num;i++) {
+                 newnode.key[i]=node.key[i+node.num+1];
+             }
              for(int i=0;i<=newnode.num;i++){
                  newnode.children[i]=node.children[i+node.num+1];
              }
@@ -434,7 +438,7 @@ namespace sjtu {
                   midroot root;
                   leaves leave;
                   readfile(&root,catalogue.root,1, sizeof(midroot));
-                  readfile(&leave,catalogue.tail,1, sizeof(leaves));
+                  readfile(&leave,catalogue.tail,1, sizeof(leave));
 
                   root.key[0]=key;
                   leave.datak[0]=key;
@@ -482,22 +486,19 @@ namespace sjtu {
         // Access Specified Element
         // return a reference to the first value that is mapped to a key equivalent to
         // key. Throw an exception if the key does not exist
-        Value& at(const Key& key) {}
-        // Overloaded of const []
-        // Access Specified Element
-        // return a reference to the first value that is mapped to a key equivalent to
-        // key. Throw an exception if the key does not exist.
-        const Value& at(const Key& key) const {
-            size_t leafpos = findleaves(key,catalogue.root);
-            leaves leaf;
-            readfile(&leaf,leafpos,1, sizeof(leaves));
-            for(int i=0;i<leaf.pairnum;i++)
+        Value at(const Key& key) {}
+        size_t leafpos = findleaves(key,catalogue.root);
+        leaves leaf;
+        readfile(&leaf,leafpos,1, sizeof(leaves));
+        for(int i=0;i<leaf.pairnum;i++)
+        {
+            if(leaf.datak[i]==key)
             {
-                if(leaf.datak[i]==key)
-                {
-                    return leaf.datav[i];
-                }
+                return leaf.datav[i];
             }
+        }
+        const Value& at(const Key& key) const {
+
          }
         // Return a iterator to the beginning
         iterator begin() {}
