@@ -125,7 +125,6 @@ namespace sjtu {
         indexs catalogue;//我英语很棒了
         bool whetherexist=false;//竟然还有文件原来已经存在这一说。。
         filename txtname;
-    public:
         //进行一些文件操作，本来想直接open等但是不如写成函数来的快--------下面进行第二次调试及更改
         void openfile(){
             whetherexist=true;
@@ -294,7 +293,7 @@ namespace sjtu {
             return  pair<iterator,OperationResult >(ret,Success);
         }
         void insertnode(midroot & mid,Key key,size_t newleafpos){
-            int i=0;
+            size_t i=0;
             for(;i<mid.num;i++){
                 if(key<mid.key[i]) break;
             }
@@ -319,7 +318,7 @@ namespace sjtu {
             leaf.pairnum/=2;
 
             newleaf.position=catalogue.endd;
-            for(int i=0;i<newleaf.pairnum;i++){
+            for(size_t i=0;i<newleaf.pairnum;i++){
                 newleaf.datak[i]=leaf.datak[leaf.pairnum+i];
                 newleaf.datav[i]=leaf.datav[leaf.pairnum+i];
                 //注意这个iterator
@@ -482,7 +481,7 @@ namespace sjtu {
         // Access Specified Element
         // return a reference to the first value that is mapped to a key equivalent to
         // key. Throw an exception if the key does not exist
-        Value& at(const Key& key) {
+        Value  at(const Key& key) {
             ssize_t leafpos = findleaves(key,catalogue.root);
             leaves leaf;
             readfile(&leaf,leafpos,1, sizeof(leaves));
