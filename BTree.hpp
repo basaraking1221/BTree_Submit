@@ -54,6 +54,12 @@ namespace sjtu {
                 leafposition=other.leafposition;
                 pairposition=other.pairposition;
             }
+            const_iterator(const const_iterator& other) {
+                // TODO Copy Constructor
+                bplustree=other.bplustree;
+                leafposition=other.leafposition;
+                pairposition=other.pairposition;
+            }
         };
     private:
         static const  int Mmax=3000;
