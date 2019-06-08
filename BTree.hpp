@@ -341,7 +341,7 @@ namespace sjtu {
         //终于到了激动人心的分裂，我还没怎么搞懂的地方
         void splitleaf(leaves &leaf, iterator & tmp, Key &key){
             leaves newleaf;
-            newleaf.pairnum=leaf.pairnum/2;
+            newleaf.pairnum=leaf.pairnum-leaf.pairnum/2;
             leaf.pairnum/=2;
 
             newleaf.position=catalogue.endd;
@@ -389,7 +389,7 @@ namespace sjtu {
              * 加起来有M-1个 中间一个key应该上移给node的爸爸
              * 这样node 有M/2+1个child  new_node有M-M/2个child
              */
-            newnode.num=node.num/2-1;
+            newnode.num=node.num-node.num/2-1;
             node.num/=2;
             newnode.position=catalogue.endd;
             catalogue.endd+= sizeof(midroot);
