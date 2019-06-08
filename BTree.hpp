@@ -234,7 +234,7 @@ namespace sjtu {
                 for(;i<tmp.num;i++){
                     if(key<tmp.key[i]) break;//找到真爱
                 }
-                return tmp.children[i];
+                return tmp.children[i-1];
             }
             else {
                 size_t i=0;
@@ -245,7 +245,7 @@ namespace sjtu {
                         break;
                     }
                 }
-                return findleaves(key,tmp.children[i]);
+                return findleaves(key,tmp.children[i-1]);
             }
         }
         //插入之前应该先会查找吧，不然插个龟龟
