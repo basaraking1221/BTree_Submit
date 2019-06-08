@@ -33,6 +33,33 @@ namespace sjtu {
                 leafposition=other.leafposition;
                 pairposition=other.pairposition;
             }
+            iterator operator++(int) {
+                // Todo iterator++
+
+            }
+            iterator& operator++() {
+                // Todo ++iterator
+            }
+            iterator operator--(int) {
+                // Todo iterator--
+            }
+            iterator& operator--() {
+                // Todo --iterator
+            }
+            // Overloaded of operator '==' and '!='
+            // Check whether the iterators are same
+            bool operator==(const iterator& rhs) const {
+                // Todo operator ==
+            }
+            bool operator==(const const_iterator& rhs) const {
+                // Todo operator ==
+            }
+            bool operator!=(const iterator& rhs) const {
+                // Todo operator !=
+            }
+            bool operator!=(const const_iterator& rhs) const {
+                // Todo operator !=
+            }
         };
 
         class const_iterator {
