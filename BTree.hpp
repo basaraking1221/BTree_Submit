@@ -240,14 +240,14 @@ namespace sjtu {
             if(tmp.type==true)//恭喜你有儿子了
             {
                 size_t i=0;
-                for(;i<tmp.num;i++){
+                for(i=0;i<tmp.num;i++){
                     if(key<tmp.key[i]) break;//找到真爱
                 }
                 return tmp.children[i];
             }
             else {
                 size_t i=0;
-                for(;i<tmp.num;i++){
+                for(i=0;i<tmp.num;i++){
                     if(key<tmp.key[i]) break;
                     if(key==tmp.key[i]){
                         i++;
@@ -293,7 +293,7 @@ namespace sjtu {
         pair<iterator,OperationResult > insertleaf(leaves &leaf,Key key,Value value ){
             iterator ret;
             size_t i=0;
-            for(;i<leaf.pairnum;i++){
+            for(i=0;i<leaf.pairnum;i++){
                 if(key<leaf.datak[i]) break;
             }
             //可能插入第一个数据的时候，叶子节点还是空的，所以要处理下
@@ -518,10 +518,10 @@ namespace sjtu {
         // return a reference to the first value that is mapped to a key equivalent to
         // key. Throw an exception if the key does not exist
         Value  at(const Key& key) {
-            ssize_t leafpos = findleaves(key,catalogue.root);
+            size_t leafpos = findleaves(key,catalogue.root);
             leaves leaf;
             readfile(&leaf,leafpos,1, sizeof(leaves));
-            for(int i=0;i<leaf.pairnum;i++)
+            for(size_t i=0;i<leaf.pairnum;i++)
             {
                 if(leaf.datak[i]==key)
                 {
@@ -533,9 +533,6 @@ namespace sjtu {
         // Access Specified Element
         // return a reference to the first value that is mapped to a key equivalent to
         // key. Throw an exception if the key does not exist.
-        const Value& at(const Key& key) const {
-
-        }
         // Return a iterator to the beginning
         iterator begin() {}
         const_iterator cbegin() const {}
