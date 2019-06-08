@@ -6,8 +6,8 @@
 #include "exception.hpp"
 #include <fstream>
 #include <cstring>
-const  int Mmax=2000;
-const  int Lmax=300;
+const  int Mmax=1000;
+const  int Lmax=400;
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
     class BTree {
@@ -118,7 +118,7 @@ namespace sjtu {
             ssize_t position;
             midroot(){
                 parent=0;
-                memset(children,0,Mmax+1);
+                memset(children,0,Mmax);
                 num=0;
                 type= false;
                 position=0;
@@ -144,7 +144,7 @@ namespace sjtu {
         };
         struct filename{
             char *str;
-            filename(){str=new char [300];}
+            filename(){str=new char [100];}
             ~filename(){if(!str) delete str;}
         };//第二次加的，刚搞明白不能用路径来写。。
         FILE *txt;//txt文本
@@ -159,7 +159,7 @@ namespace sjtu {
             if(whetheropen == false){
                 txt=fopen(txtname.str,"rb+");
             }
-            if(txt==NULL){
+            if(txt== nullptr){
                 whetherexist= false;//鬼知道还会打开失败歪日，你试试第一次运行就没打开的心态？
                 txt=fopen(txtname.str,"w");
                 fclose(txt);
@@ -197,7 +197,7 @@ namespace sjtu {
             catalogue.endd+= sizeof(leaves);
             //挨个初始化
             root.parent=0;
-            root.num=0;
+            root.num=1;
             root.type=true;
             root.children[0]=leaf.position;
             leaf.parent=root.position;
@@ -209,7 +209,7 @@ namespace sjtu {
             writefile(&leaf,leaf.position,1, sizeof(leaves));
         }
         BTree() {
-            txt=NULL;
+            txt= nullptr;
             openfile();
             if(whetherexist==false)//第二次写添加，所有有关存在的都是，不再赘述
                 maketree();
