@@ -87,7 +87,7 @@ namespace sjtu {
             ssize_t children[Mmax+1];
             bool type;
             Key key[Mmax];
-            int num;
+            size_t num;
             ssize_t position;
             midroot(){
                 parent=0;
@@ -102,7 +102,7 @@ namespace sjtu {
         struct leaves{
             ssize_t parent;
             ssize_t prev,next;
-            long long pairnum;
+            size_t pairnum;
             //你敢信我写到最后了才发现，这个Value_type跟我写的不一样？？？？
             Key datak[Lmax+1];
             Value datav[Lmax+1];
@@ -224,7 +224,7 @@ namespace sjtu {
             size_t leafpos = findleaves(key,catalogue.root);//挖他祖坟
             leaves leaf;
             readfile(&leaf,leafpos,1, sizeof(leaves));
-            for(int i=0;i<leaf.pairnum;i++){
+            for(size_t i=0;i<leaf.pairnum;i++){
                 //我怎么觉得数据类型不太对。。。好奇怪 列为一个bug点
                 if(leaf.datak[i]==key){
                     iterator ret;
@@ -240,7 +240,7 @@ namespace sjtu {
             size_t leafpos = findleaves(key,catalogue.root);//挖他祖坟
             leaves leaf;
             readfile(&leaf,leafpos,1, sizeof(leaves));
-            for(int i=0;i<leaf.pairnum;i++){
+            for(size_t i=0;i<leaf.pairnum;i++){
                 //我怎么觉得数据类型不太对。。。好奇怪 列为一个bug点
                 if(leaf.datak[i]==key){
                     iterator ret;
@@ -272,7 +272,7 @@ namespace sjtu {
 
             }
             //否则就疯狂后移
-            for(int j =leaf.pairnum-1;j>=i;j--){
+            for(size_t j =leaf.pairnum-1;j>=i;j--){
                 leaf.datak[j+1]=leaf.datak[j];
                 leaf.datav[j+1]=leaf.datav[j];
             }
@@ -364,15 +364,15 @@ namespace sjtu {
             node.num/=2;
             newnode.position=catalogue.endd;
             catalogue.endd+= sizeof(midroot);
-            for(int i=0;i<=newnode.num;i++){
+            for(size_t i=0;i<=newnode.num;i++){
                 newnode.children[i]=node.children[i+node.num+1];
             }
-            for(int i=0;i<newnode.num;i++){
+            for(size_t i=0;i<newnode.num;i++){
                 newnode.key[i]=node.key[i+node.num+1];
             }
             newnode.type=node.type;
 
-            for(int i=0;i<=newnode.num;i++) {
+            for(size_t i=0;i<=newnode.num;i++) {
                 if (newnode.type == true) {
                     leaves leaf;
                     readfile(&leaf, newnode.children[i], 1, sizeof(leaves));
@@ -479,13 +479,8 @@ namespace sjtu {
         // Access Specified Element
         // return a reference to the first value that is mapped to a key equivalent to
         // key. Throw an exception if the key does not exist
-        Value& at(const Key& key) {}
-        // Overloaded of const []
-        // Access Specified Element
-        // return a reference to the first value that is mapped to a key equivalent to
-        // key. Throw an exception if the key does not exist.
-        const Value& at(const Key& key) const {
-            size_t leafpos = findleaves(key,catalogue.root);
+        Value& at(const Key& key) {
+            ssize_t leafpos = findleaves(key,catalogue.root);
             leaves leaf;
             readfile(&leaf,leafpos,1, sizeof(leaves));
             for(int i=0;i<leaf.pairnum;i++)
@@ -495,6 +490,13 @@ namespace sjtu {
                     return leaf.datav[i];
                 }
             }
+        }
+        // Overloaded of const []
+        // Access Specified Element
+        // return a reference to the first value that is mapped to a key equivalent to
+        // key. Throw an exception if the key does not exist.
+        const Value& at(const Key& key) const {
+
         }
         // Return a iterator to the beginning
         iterator begin() {}
