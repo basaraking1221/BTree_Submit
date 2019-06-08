@@ -20,8 +20,8 @@ namespace sjtu {
             ~filename(){ if(!str) delete str;}
 
 
-        };
-
+        };//第二次加的，刚搞明白不能用路径来写。。
+        //中间节点
         struct midroot{
 
             int offset;   //自己的偏移量
@@ -44,15 +44,14 @@ namespace sjtu {
             }
 
         };
-
+        //叶子节点
         struct leaves{
 
             int offset;
             int father;
             int prev,next;
             int pairnum;
-
-            //value_type data[L+1];   //每个叶子结点放L个数据 数组开L+1 给插入留余量   我去pair只能读不能写？？？！！！！
+            //你敢信我写到最后了才发现，这个Value_type跟我写的不一样？？？？
             Key k[Lmax+1];
             Value v[Lmax+1];
 
@@ -65,13 +64,13 @@ namespace sjtu {
             }
 
         };
-
+        //根节点？也不算吧，那就定名为索引。
         struct indexs{
-            int head;   //第一个叶子结点的位置
-            int tail;   //最后一个叶子结点的位置
-            int root;   //根结点的位置   一开始应该在base的后面
+            int head;
+            int tail;
+            int root;
             int size;
-            int eof;    //文件末尾
+            int eof;
 
             indexs()
             {
@@ -84,10 +83,10 @@ namespace sjtu {
         };
 
     private:
-        FILE *txt;
-        bool whetheropen;
-        indexs base;
-        bool whetherexist;
+        FILE *txt;//txt文本
+        bool whetheropen;//打不打开
+        indexs catalogue;//我英语很棒了
+        bool whetherexist;//竟然还有文件原来已经存在这一说。。
         filename txtname;
 
 
@@ -182,24 +181,18 @@ namespace sjtu {
             // And other methods in iterator, please fill by yourself.
         };
 
-
+        //进行一些文件操作，本来想直接open等但是不如写成函数来的快--------下面进行第二次调试及更改
         void openfile(){
 
             whetherexist=1;
             if(whetheropen==0)
             {
-
-                //如果这个文件已存在 并且 原来时关着的 就打开它 并且把信息读到base
                 txt= fopen(txtname.str,"rb+");
 
-                //打开成功fopen返回指针地址，否则返回NULL
-                //然后检查一下文件是否打开成功  没打开成功说明文件不存在嗷
                 if(txt== nullptr)
                 {
-                    whetherexist=false;
-                    //w：只能向文件写数据，若指定的文件不存在则创建它，如果存在则先删除它再重建一个新文件
+                    whetherexist=false;//鬼知道还会打开失败歪日，你试试第一次运行就没打开的心态？
                     txt = fopen(txtname.str,"w");
-                    //现在有文件啦  再以rw+打开  但是这个文件里没有bpt的基本信息嗷  待会用build_a_tree往里面写
                     fclose(txt);
                     txt =fopen(txtname.str,"rb+");
 
@@ -208,13 +201,17 @@ namespace sjtu {
 
 
 
-                    //说明刚刚打开成功啦 已经有 bpt的信息啦 现在要读basic_info进内存
                 else{
-                    readfile(&base,0,1, sizeof(indexs));
+                    readfile(&catalogue,0,1, sizeof(indexs));
                 }
 
                 whetheropen=1;
             }
+        }
+        void closefile(){
+            if(whetheropen==true)
+                fclose(txt);
+            whetheropen= false;
         }
 
         void readfile(void *place,int offset,int count,int size)
@@ -229,22 +226,21 @@ namespace sjtu {
             fwrite(place,size,count,txt);
 
         }
+//第一次就写这几个应该够了吧
 
-
-        //=======================================构造 析构======================================//
         void makeatree()
         {
             //先开始操作目录
-            base.size=0;
-            base.eof= sizeof(indexs);
+            catalogue.size=0;
+            catalogue.eof= sizeof(indexs);
             //根节点和叶子节点建立
             midroot root;
             leaves leaf;
             //一步步的摆正目录、各个节点的位置（position）
-            base.root=root.offset=base.eof;
-            base.eof+= sizeof(midroot);
-            base.head=base.tail=leaf.offset=base.eof;
-            base.eof+= sizeof(leaves);
+            catalogue.root=root.offset=catalogue.eof;
+            catalogue.eof+= sizeof(midroot);
+            catalogue.head=catalogue.tail=leaf.offset=catalogue.eof;
+            catalogue.eof+= sizeof(leaves);
             //挨个初始化
             root.father=0;
             root.num=0;
@@ -254,14 +250,14 @@ namespace sjtu {
             leaf.next=leaf.prev=0;
             leaf.pairnum=0;
             //全扔进文件里，写tmd
-            writefile(&base,0,1, sizeof(indexs));
+            writefile(&catalogue,0,1, sizeof(indexs));
             writefile(&root,root.offset,1, sizeof(midroot));
             writefile(&leaf,leaf.offset,1, sizeof(leaves));
         }
         // Default Constructor and Copy Constructor
         BTree() {
             // Todo Default
-
+            //第二次写添加，所有有关存在的都是，不再赘述
             txt=NULL;
             openfile();
 
@@ -270,36 +266,30 @@ namespace sjtu {
 
         }
         BTree(const BTree& other) {
-            // Todo Copy
+            //对不起这个我不会写
 
         }
         BTree& operator=(const BTree& other) {
             // Todo Assignment
         }
         ~BTree() {
-            // Todo Destructor
-
-            if(whetheropen==1)
-            {
-                fclose(txt);
-                whetheropen=0;
-            }
+            closefile();
 
         }
-
+        //貌似查找直接遍历不行。。。所以我们现在在叶子节点操作下
         int findleaves(Key key,int offset)
         {
             midroot p;
 
             readfile(&p,offset, 1, sizeof(midroot));
 
-            if(p.type==1)   //说明它的下一个是叶子结点啦
+            if(p.type==1)  //恭喜你有儿子了
             {
 
                 int pos=0;
                 for(pos=0;pos<p.num;pos++)
                 {
-                    if(key<p.key[pos])  break;
+                    if(key<p.key[pos])  break;//找到真爱
                 }
 
                 //注意孩子数比结点数多一个 pos++ 跳出循环后 也有孩子的
@@ -322,7 +312,39 @@ namespace sjtu {
             }
 
         }
+        //插入之前应该先会查找吧，不然插个龟龟
+        iterator find(const Key& key) {
+            size_t leafpos = findleaves(key,catalogue.root);//挖他祖坟
+            leaves leaf;
+            readfile(&leaf,leafpos,1, sizeof(leaves));
+            for(size_t i=0;i<leaf.pairnum;i++){
+                //我怎么觉得数据类型不太对。。。好奇怪 列为一个bug点
+                if(leaf.datak[i]==key){
+                    iterator ret;
+                    ret.bpt=this;
+                    ret.leafoffset=leafpos;
+                    ret.pairpos=i;
+                    return ret;
+                }
+            }
 
+        }
+        const_iterator find(const Key& key) const {//没错我直接复制下来的
+            size_t leafpos = findleaves(key,catalogue.root);//挖他祖坟
+            leaves leaf;
+            readfile(&leaf,leafpos,1, sizeof(leaves));
+            for(size_t i=0;i<leaf.pairnum;i++){
+                //我怎么觉得数据类型不太对。。。好奇怪 列为一个bug点
+                if(leaf.datak[i]==key){
+                    iterator ret;
+                    ret.bpt=this;
+                    ret.leafoffset=leafpos;
+                    ret.pairpos=i;
+                    return ret;
+                }
+            }
+        }
+        //同样重新写，先插入叶子节点
         pair<iterator,OperationResult> insertleaf(leaves &leaf,Key key,Value value)
         {
             iterator ret;
@@ -333,18 +355,15 @@ namespace sjtu {
 
                 if(key<leaf.k[pos]) break;
             }
-
-            //刚开始插入数据的时候 第一次在根的左孩子里插入时 根的左孩子还没有数据
+            //可能插入第一个数据的时候，叶子节点还是空的，所以要处理下
             if(leaf.pairnum==0)
             {
                 leaf.k[0]=key;
                 leaf.v[0]=value;
 
-                //维护size!!!!!
                 leaf.pairnum=1;
-                ++base.size;
+                ++catalogue.size;
 
-                //设置迭代器
                 ret.bpt=this;
                 ret.pairpos=pos;
                 ret.leafoffset=leaf.offset;
@@ -353,22 +372,19 @@ namespace sjtu {
 
                 return pair<iterator,OperationResult > (ret,Success);
             }
-            //每个数据后移
+            //否则就技能疯狂后摇
             for(int i=leaf.pairnum-1;i>=pos;--i)
             {
                 leaf.k[i+1]=leaf.k[i];
                 leaf.v[i+1]=leaf.v[i];
             }
 
-            //插入
             leaf.k[pos]=key;
             leaf.v[pos]=value;
 
-            //维护size
             ++leaf.pairnum;
-            ++base.size;
+            ++catalogue.size;
 
-            //设置迭代器
             ret.bpt=this;
             ret.pairpos=pos;
             ret.leafoffset=leaf.offset;
@@ -379,38 +395,30 @@ namespace sjtu {
 
             return pair<iterator,OperationResult > (ret,Success);
 
-
-
-
         }
-
-
+//终于到了激动人心的分裂，我还没怎么搞懂的地方
         void splitleaf (leaves &leaf, iterator & it, Key &key)
         {
             leaves new_leaf;
 
-            //维护numOfpair
             new_leaf.pairnum=leaf.pairnum-leaf.pairnum/2;
             leaf.pairnum/=2;
 
-            //维护new_leaf的offset
-            new_leaf.offset=base.eof;
+            new_leaf.offset=catalogue.eof;
 
             for(int i=0;i<new_leaf.pairnum;i++)
             {
                 new_leaf.k[i]=leaf.k[leaf.pairnum+i];
                 new_leaf.v[i]=leaf.v[leaf.pairnum+i];
 
-
-                //维护iterator  如果新插入数据被分到new_leaf
+//注意这个iterator
                 if(new_leaf.k[i]==key)
                 {
                     it.leafoffset=new_leaf.offset;
                     it.pairpos=i;
                 }
             }
-
-            //维护叶子结点 顺序  注意读入leaf.next 修改它的prev
+            //分裂完了就插入进去
             new_leaf.next=leaf.next;
             new_leaf.prev=leaf.offset;
 
@@ -422,17 +430,15 @@ namespace sjtu {
                 writefile(&leaf_next,leaf_next.offset,1,sizeof(leaves));
             }
             leaf.next=new_leaf.offset;
-
-            //维护base
-            if(base.tail==leaf.offset)  base.tail=new_leaf.offset;
-            base.eof+= sizeof(leaves);
-
-            //维护爸爸
+            //目录也要改变
+            if(catalogue.tail==leaf.offset)  catalogue.tail=new_leaf.offset;
+            catalogue.eof+= sizeof(leaves);
+            //他爹也是哦宝贝 （怎么就这么多我吐了）
             new_leaf.father=leaf.father;
 
             writefile(&leaf,leaf.offset,1, sizeof(leaves));
             writefile(&new_leaf,new_leaf.offset,1, sizeof(leaves));
-            writefile(&base,0,1, sizeof(indexs));
+            writefile(&catalogue,0,1, sizeof(indexs));
 
 
             midroot father;
@@ -441,8 +447,6 @@ namespace sjtu {
 
 
         }
-
-
         void insertnode(midroot & cur,Key key,int new_leaf_offset)
         {
 
@@ -465,20 +469,15 @@ namespace sjtu {
             cur.key[pos]=key;
             cur.children[pos+1]=new_leaf_offset;
 
-            //维护numOfkey
             ++cur.num;
 
 
-            // 写回去  考虑分裂node
             if(cur.num<=Mmax-1)
                 writefile(&cur,cur.offset,1,sizeof(midroot));
             else
                 splitmidroot(cur);
 
-
-
         }
-
         void splitmidroot(midroot & node)
         {
 
@@ -486,26 +485,18 @@ namespace sjtu {
 
             new_node.num=node.num-node.num/2-1;
             node.num/=2;
-            new_node.offset=base.eof;
-            base.eof+= sizeof(midroot);
+            new_node.offset=catalogue.eof;
+            catalogue.eof+= sizeof(midroot);
 
-            //更新new_node的数据
             for(int i=0;i<new_node.num;i++)
             {
-                new_node.key[i]=node.key[i+node.num+1];  //从numOfkey+1开始抄  numOfkey号key应该写到爸爸里
-            }
+                new_node.key[i]=node.key[i+node.num+1];             }
 
             for(int i=0;i<=new_node.num;i++)
             {
-                new_node.children[i]=node.children[i+node.num+1];   //从numOfkey+1（下标）开始抄 numOfkey号（下标）放在node的最后一个
+                new_node.children[i]=node.children[i+node.num+1];
             }
-
-
             new_node.type=node.type;
-
-
-            //更新新结点的孩子们的father
-
 
             for(int i=0;i<=new_node.num;i++)
             {
@@ -524,37 +515,28 @@ namespace sjtu {
                 }
 
             }
-
-
-
-
-
-            //把中间那个插到爸爸里  考虑爸爸是root
-            if(node.offset == base.root)
+            //还要考虑他爹是不是根，杀了我吧
+            if(node.offset == catalogue.root)
             {
 
-                //新建一个根
                 midroot new_root;
                 new_root.father=0;
                 new_root.type=0;
-                new_root.offset=base.eof;
-                base.eof+= sizeof(midroot);
+                new_root.offset=catalogue.eof;
+                catalogue.eof+= sizeof(midroot);
                 new_root.num=1;
-
+                //输入新的呢！
                 new_root.key[0]=node.key[node.num];
                 new_root.children[0]=node.offset;
                 new_root.children[1]=new_node.offset;
-
-                //更新node new_node的爸爸
+                //更新他的papa
                 node.father=new_root.offset;
                 new_node.father=new_root.offset;
+                //还有个目录（最后了吧我哭）
+                catalogue.root=new_root.offset;
 
-                //更新base的root;
-                base.root=new_root.offset;
-
-
-                //写进文件
-                writefile(&base,0,1,sizeof(indexs));
+                //写入文件
+                writefile(&catalogue,0,1,sizeof(indexs));
                 writefile(&node,node.offset,1,sizeof(midroot));
                 writefile(&new_node,new_node.offset,1, sizeof(midroot));
                 writefile(&new_root,new_root.offset,1,sizeof(midroot));
@@ -564,7 +546,7 @@ namespace sjtu {
             else
             {
                 new_node.father=node.father;
-                writefile(&base,0,1,sizeof(indexs));
+                writefile(&catalogue,0,1,sizeof(indexs));
                 writefile(&node,node.offset,1,sizeof(midroot));
                 writefile(&new_node,new_node.offset,1, sizeof(midroot));
 
@@ -572,28 +554,23 @@ namespace sjtu {
                 readfile(&father,node.father,1, sizeof(midroot));
                 insertnode(father,node.key[node.num],new_node.offset);
             }
-
-
-
         }
-
-
-
+//大家好，我们终于可以开始插入了
         pair<iterator, OperationResult> insert(const Key& key, const Value& value) {
 
-            if(base.size==0)
+            if(catalogue.size==0)
             {
                 midroot root;
                 leaves leaf_right;
 
-                readfile(&root,base.root,1, sizeof(midroot));
-                readfile(&leaf_right,base.tail,1, sizeof(leaves));
+                readfile(&root,catalogue.root,1, sizeof(midroot));
+                readfile(&leaf_right,catalogue.tail,1, sizeof(leaves));
 
                 root.key[0]=key;
                 leaf_right.k[0]=key;
                 leaf_right.v[0]=value;
 
-                base.size=1;
+                catalogue.size=1;
                 root.num=1;
                 leaf_right.pairnum=1;
 
@@ -603,22 +580,18 @@ namespace sjtu {
                 p.pairpos=0;
 
 
-                writefile(&root,base.root,1, sizeof(midroot));
-                writefile(&leaf_right,base.tail,1,sizeof(leaves));
+                writefile(&root,catalogue.root,1, sizeof(midroot));
+                writefile(&leaf_right,catalogue.tail,1,sizeof(leaves));
 
                 return pair<iterator,OperationResult >(p,Success);
 
             }
 
-            //找到在哪个叶子结点
-            int cur_leaf_node_offset=findleaves(key,base.root);
 
-            //在该叶子结点里面插入key value
-            //先往new_node里面写 然后在write回去 覆盖掉
+            int cur_leaf_node_offset=findleaves(key,catalogue.root);
+
             leaves new_node;
 
-            //<????>
-            //先把文件里的数据写进new_node
             readfile(&new_node,cur_leaf_node_offset,1, sizeof(leaves));
             pair<iterator,OperationResult > ret =insertleaf(new_node,key,value);
             return ret;
@@ -646,7 +619,7 @@ namespace sjtu {
         // Return the value refer to the Key(key)
         Value at(const Key& key){
 
-            int leafpos = findleaves(key,base.root);
+            int leafpos = findleaves(key,catalogue.root);
             leaves leaf;
             readfile(&leaf,leafpos,1, sizeof(leaves));
             for(size_t i=0;i<leaf.pairnum;i++)
@@ -676,37 +649,6 @@ namespace sjtu {
          *   If no such element is found, past-the-end (see end()) iterator is
          * returned.
          */
-        iterator find(const Key& key) {
-            size_t leafpos = findleaves(key,base.root);//挖他祖坟
-            leaves leaf;
-            readfile(&leaf,leafpos,1, sizeof(leaves));
-            for(size_t i=0;i<leaf.pairnum;i++){
-                //我怎么觉得数据类型不太对。。。好奇怪 列为一个bug点
-                if(leaf.datak[i]==key){
-                    iterator ret;
-                    ret.bpt=this;
-                    ret.leafoffset=leafpos;
-                    ret.pairpos=i;
-                    return ret;
-                }
-            }
-
-        }
-        const_iterator find(const Key& key) const {//没错我直接复制下来的
-            size_t leafpos = findleaves(key,base.root);//挖他祖坟
-            leaves leaf;
-            readfile(&leaf,leafpos,1, sizeof(leaves));
-            for(size_t i=0;i<leaf.pairnum;i++){
-                //我怎么觉得数据类型不太对。。。好奇怪 列为一个bug点
-                if(leaf.datak[i]==key){
-                    iterator ret;
-                    ret.bpt=this;
-                    ret.leafoffset=leafpos;
-                    ret.pairpos=i;
-                    return ret;
-                }
-            }
-        }
 
     };
 }  // namespace sjtu
