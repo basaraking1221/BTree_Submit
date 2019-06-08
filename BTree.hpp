@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <fstream>
 #include <cstring>
+#include"exception.hpp"
 namespace sjtu {
     template <class Key, class Value, class Compare = std::less<Key> >
     class BTree {
